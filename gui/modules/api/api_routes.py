@@ -184,6 +184,9 @@ def getEndpointLease():
     response_payload = {'error': '', 'msg': '', 'kamreload': globals.reload_required, 'data': []}
     lease_data = {}
 
+    # Get remote ip address
+    remote_addr = request.remote_addr
+
     try:
         if (settings.DEBUG):
             debugEndpoint()
@@ -203,6 +206,13 @@ def getEndpointLease():
         if r.match(ttl):
             ttl = 60 * int(ttl[0:(len(ttl)-1)])
 
+        ttl_max = settings.LEASE_API_TTL_MAX
+        if r.match(ttl_max):
+            ttl_max = 60 * int(ttl_max[0:(len(ttl_max)-1)])
+
+        if int(ttl) > ttl_max:
+            raise http_exceptions.BadRequest("time to live (ttl) is over the max value of {}".format(settings.LEASE_API_TTL_MAX))
+        
         # Generate some values
         rand_num = random.randint(1, 200)
         name = "lease" + str(rand_num)
@@ -225,8 +235,14 @@ def getEndpointLease():
         db.add(Subscriber)
         db.flush()
 
+        # Check if lease rate limit was reached
+        Lease = db.query(dSIPLeases).filter((dSIPLeases.remote_addr == remote_addr) & (dSIPLeases.status == "ACTIVE")).first()
+        if Lease != None:
+            raise http_exceptions.BadRequest("an existing lease already exists (expires on {})".format(Lease.expiration))
+
         # Add to the Leases table
-        Lease = dSIPLeases(Gateway.gwid, Subscriber.id, int(ttl))
+        status = "ACTIVE"
+        Lease = dSIPLeases(Gateway.gwid, Subscriber.id, int(ttl), remote_addr, status, email)
         db.add(Lease)
         db.flush()
 

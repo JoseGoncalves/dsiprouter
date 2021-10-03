@@ -151,6 +151,9 @@ ROOT_DB_USER = 'root'
 ROOT_DB_PASS = ''
 ROOT_DB_NAME = 'mysql'
 
+# lease API settings
+LEASE_API_TTL_MAX = '30m'
+
 # Where to sync settings from
 # file  - load from setting.py file
 # db    - load from dsip_settings table

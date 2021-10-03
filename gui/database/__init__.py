@@ -228,11 +228,14 @@ class dSIPLeases(object):
     maintains a list of active leases based on seconds
     """
 
-    def __init__(self, gwid, sid, ttl):
+    def __init__(self, gwid, sid, ttl, remote_addr, status,email):
         self.gwid = gwid
         self.sid = sid
         t = datetime.now() + timedelta(seconds=ttl)
         self.expiration = t.strftime('%Y-%m-%d %H:%M:%S')
+        self.remote_addr = remote_addr
+        self.status = status
+        self.email = email
 
     pass
 
