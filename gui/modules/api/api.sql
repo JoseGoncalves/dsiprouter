@@ -5,7 +5,7 @@ CREATE TABLE `dsip_endpoint_lease` (
 	  `sid` int(10) unsigned NOT NULL,
 	  `expiration` datetime NOT NULL,
 	  `remote_addr` varchar(100) NOT NULL,
-	  `status` varchar(100) NOT NULL
-	  `email` varchar(100) NOT NULL
+	  `status` varchar(100) NOT NULL,
+	  `email` varchar(100) NOT NULL,
 	  PRIMARY KEY (`id`)
 );
